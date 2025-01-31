@@ -19,6 +19,7 @@ interface Rooms {
   roomId: string;
   users: User[];
 }
+console.log("hi");
 
 wss.on("connection", function (socket) {
   console.log("New client connected");
