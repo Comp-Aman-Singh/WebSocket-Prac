@@ -22,15 +22,12 @@ interface Rooms {
 }
 let allRooms: Rooms[] = [];
 wss.on("connection", function (socket) {
-  console.log("New client connected");
   socket.send("Hi there");
 
   socket.on("message", function (e) {
     try {
-      console.log("Received:", e.toString());
       // Parse JSON safely
       let data = JSON.parse(e.toString());
-      console.log("Parsed Data:", data);
 
       // Create a room Function
       if (data.type === "createRoom") {
@@ -156,6 +153,24 @@ wss.on("connection", function (socket) {
         }
       }
 
+      if (data.type === "groupChat") {
+
+        const selectedRoom = allRooms.filter(
+          (item) => data.roomId === item.roomId
+        );
+        if (!selectedRoom || selectedRoom.length === 0) {
+          socket.send("something went wrong");
+          return;
+        }
+
+        // @ts-ignore
+        const allMembers = selectedRoom[0].users;
+
+        allMembers.forEach((item) =>
+          item.socket.send(`${data.userId} : ${data.payload.message}`)
+        );
+        // return console.log(" selected Room 4 : ", selectedRoom[0].users);
+      }
       // if (data.type === "chat") {
       //   const currentUserRoom = allSocket.find(
       //     // @ts-ignore

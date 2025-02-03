@@ -48,6 +48,7 @@ wss.on("connection", function (socket) {
                 // Check if user is already in the room
                 const findUser = selectedRoom === null || selectedRoom === void 0 ? void 0 : selectedRoom.users.find((user) => user.userId === data.userId);
                 if (findUser) {
+                    console.log("find user : ", findUser);
                     socket.send("User already in the room");
                     return;
                 }
@@ -122,6 +123,22 @@ wss.on("connection", function (socket) {
                         });
                     }
                 }
+            }
+            if (data.type === "groupChat") {
+                console.log("group chat");
+                // Find if room is present
+                console.log("all Rooms : ", allRooms);
+                console.log("data : ", data);
+                const selectedRoom = allRooms.filter((item) => data.roomId === item.roomId);
+                console.log("selected Rooms : ", selectedRoom);
+                if (!selectedRoom || selectedRoom.length === 0) {
+                    socket.send("something went wrong");
+                    return;
+                }
+                // @ts-ignore
+                const allMembers = selectedRoom[0].users;
+                allMembers.forEach((item) => item.socket.send(`${data.userId} : ${data.payload.message}`));
+                // return console.log(" selected Room 4 : ", selectedRoom[0].users);
             }
             // if (data.type === "chat") {
             //   const currentUserRoom = allSocket.find(
